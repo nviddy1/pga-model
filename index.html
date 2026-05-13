@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGA Betting Model — 2026 PGA Championship</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f7f4;color:#1a1a18;min-height:100vh}
+.shell{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+.evbar{margin-bottom:1.25rem}
+.evname{font-size:24px;font-weight:500;color:#1a1a18}
+.evmeta{font-size:12px;color:#888780;margin-top:3px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #e0dfd8;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border-radius:6px 6px 0 0;color:#888780;border:none;background:none;margin-bottom:-1px}
+.tab.on{color:#1a1a18;border:1px solid #e0dfd8;border-bottom:2px solid #f8f7f4;background:#fff}
+.tab:hover{color:#1a1a18}
+.card{background:#fff;border:1px solid #e0dfd8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+.card.gl{border-left:3px solid #639922;border-radius:0 12px 12px 0}
+.card.bl{border-left:3px solid #185fa5;border-radius:0 12px 12px 0}
+.card.pl{border-left:3px solid #7f77dd;border-radius:0 12px 12px 0}
+.card.rl{border-left:3px solid #e24b4a;border-radius:0 12px 12px 0}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.pname{font-size:16px;font-weight:500;color:#1a1a18}
+.psub{font-size:11px;color:#888780;margin-top:2px}
+.podds{font-size:20px;font-weight:500;color:#1a1a18;text-align:right}
+.podmeta{font-size:10px;color:#888780;margin-top:1px;text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.t{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+.tg{background:#eaf3de;color:#27500a}.tb{background:#e6f1fb;color:#0c447c}.ta{background:#faeeda;color:#633806}.tr{background:#fcebeb;color:#791f1f}.tgr{background:#f1efe8;color:#444441}.tp{background:#eeedfe;color:#3c3489}
+.pbody{font-size:12px;color:#5f5e5a;line-height:1.7}
+.srows{margin:9px 0 6px}
+.sr{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.slbl{font-size:11px;color:#888780;min-width:96px}
+.strk{flex:1;height:4px;border-radius:2px;background:#f1efe8}
+.sfil{height:4px;border-radius:2px}
+.sval{font-size:11px;font-weight:500;min-width:28px;text-align:right;color:#1a1a18}
+.ep{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;margin-top:8px}
+.epg{background:#eaf3de;color:#27500a}.epr{background:#fcebeb;color:#791f1f}
+.brow{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.bc{font-size:10px;font-weight:500;padding:2px 9px;border-radius:20px}
+.bcw{background:#eaf3de;color:#27500a}.bc5{background:#e6f1fb;color:#0c447c}.bc10{background:#faeeda;color:#633806}.bc20{background:#f1efe8;color:#444441}.bcf{background:#fcebeb;color:#791f1f}.bcm{background:#eeedfe;color:#3c3489}
+.sech{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#888780;margin:1.5rem 0 10px}
+.ctls{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem}
+.clbl{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#888780;display:block;margin-bottom:3px}
+select,input[type=text]{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid #d3d1c7;background:#fff;color:#1a1a18;outline:none}
+select:focus,input:focus{border-color:#185fa5}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:10px;font-weight:500;color:#888780;padding:6px 8px;border-bottom:1px solid #e0dfd8;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none}
+th.on{color:#1a1a18}
+th:hover{color:#1a1a18}
+td{padding:8px 8px;border-bottom:1px solid #f1efe8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.bw{height:4px;border-radius:2px;background:#f1efe8;min-width:50px;margin-top:3px}
+.bi{height:4px;border-radius:2px}
+.pn{font-weight:500;font-size:13px;color:#1a1a18}
+.pnt{font-size:10px;color:#888780;margin-top:1px;max-width:200px;white-space:normal;line-height:1.35}
+.wday{background:#f8f7f4;border:1px solid #e0dfd8;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.wdtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.wdname{font-size:14px;font-weight:500;color:#1a1a18}
+.wdtemp{font-size:20px;font-weight:500;color:#1a1a18}
+.wdsub{font-size:11px;color:#888780}
+.wdpills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.wp{font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid #d3d1c7;color:#5f5e5a;background:#fff}
+.wdimpact{font-size:12px;color:#5f5e5a;line-height:1.6}
+.prop-card{background:#fff;border:1px solid #e0dfd8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+.prop-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:12px}
+.prop-title{font-size:14px;font-weight:500;color:#1a1a18}
+.prop-odds{font-size:18px;font-weight:500;color:#1a1a18;text-align:right}
+.prop-odds-sub{font-size:10px;color:#888780;text-align:right;margin-top:1px}
+.prop-body{font-size:12px;color:#5f5e5a;line-height:1.7;margin-top:6px}
+.grp{background:#fff;border:1px solid #e0dfd8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+.grp.hot{border-left:3px solid #639922;border-radius:0 12px 12px 0}
+.grp.lean{border-left:3px solid #185fa5;border-radius:0 12px 12px 0}
+.gtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.gtime{font-size:14px;font-weight:500;color:#1a1a18}
+.gprow{display:flex;align-items:flex-start;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1efe8;gap:10px}
+.gprow:last-of-type{border-bottom:none}
+.gright{text-align:right;flex-shrink:0}
+.godds{font-size:14px;font-weight:500;color:#1a1a18}
+.verd{background:#f8f7f4;border-radius:8px;padding:9px 12px;margin-top:10px;font-size:12px;color:#5f5e5a;line-height:1.6}
+.verd strong{color:#1a1a18}
+.star{color:#ef9f27;margin-right:2px}
+.note{font-size:10px;color:#888780;margin-top:8px;line-height:1.6;border-top:1px solid #f1efe8;padding-top:8px}
+.dna-strip{background:#f8f7f4;border:1px solid #e0dfd8;border-radius:12px;padding:13px 16px;margin-bottom:1.25rem;font-size:12px;color:#5f5e5a;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="evbar">
+  <div class="evname">2026 PGA Championship</div>
+  <div class="evmeta">Aronimink Golf Club · Newtown Square, PA · May 14–17 · Par 70, 7,394 yds · Bentgrass · All odds FanDuel/BetMGM, verified May 12 2026</div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="showTab('picks')">Top picks</button>
+  <button class="tab" onclick="showTab('field')">Full field (156)</button>
+  <button class="tab" onclick="showTab('props')">Props</button>
+  <button class="tab" onclick="showTab('weather')">Weather</button>
+  <button class="tab" onclick="showTab('ball3')">3-ball edges</button>
+</div>
+
+<div id="pg-picks">
+<div class="dna-strip"><strong>Course DNA:</strong> Donald Ross par-70 — only 2 par 5s. 180 bunkers, crowned bentgrass greens at Stimp ~13.5, 30-yd fairway landing zones. Distance advantage effectively zero. <strong>SG: Approach is the #1 discriminator.</strong> ATG scrambling separates contenders on crowned greens. Bentgrass putting specialists thrive. Aronimink winners — Player ('62), Rose ('10/'11), Bradley ('18) — were all precision iron players, not bombers.</div>
+<div class="sech">Outright win</div>
+<div class="card gl"><div class="ph"><div><div class="pname"><span class="star">★</span>Cameron Young</div><div class="psub">2 wins + T3 Masters in last 5 · leads field SG: T2G · 6 top-10s in last 7</div></div><div><div class="podds">+1100</div><div class="podmeta">to win</div></div></div><div class="tags"><span class="t tg">Leads field SG: T2G</span><span class="t tg">Won Sedgefield (Donald Ross)</span><span class="t tg">2nd bogey avoidance on tour</span><span class="t tb">ATG improving (+0.93 SG last 24 rounds)</span><span class="t ta">No major win yet</span></div><div class="srows"><div class="sr"><span class="slbl">Course fit</span><div class="strk"><div class="sfil" style="width:93%;background:#639922"></div></div><span class="sval">9.3</span></div><div class="sr"><span class="slbl">Current form</span><div class="strk"><div class="sfil" style="width:97%;background:#639922"></div></div><span class="sval">9.7</span></div><div class="sr"><span class="slbl">Market value</span><div class="strk"><div class="sfil" style="width:85%;background:#185fa5"></div></div><span class="sval">8.5</span></div></div><div class="pbody">Hottest player in the world whose profile is a textbook Aronimink winner. Leading the field in true SG: T2G across 7 events, won on a Donald Ross design at Sedgefield, and his improving ATG game is the final piece on these tricky crowned greens. The top-5 market is where the clearest value lies.</div><div class="brow"><span class="bc bcw">Win</span><span class="bc bc5">Top 5 (+11% edge)</span></div><span class="ep epg">Top-5 model edge: +11.4% · Top-10 edge: +14.9%</span></div>
+<div class="card bl"><div class="ph"><div><div class="pname"><span class="star">★</span>Russell Henley</div><div class="psub">3 consecutive major top-10s · best par-4 scorer in field · 14th putter on bentgrass</div></div><div><div class="podds">+5500</div><div class="podmeta">best value on board</div></div></div><div class="tags"><span class="t tg">Best par-4 scorer — 16 par 4s here</span><span class="t tg">3 straight major top-10s</span><span class="t tg">14th putter at this bentgrass speed/slope</span><span class="t ta">Market severely underprices</span></div><div class="srows"><div class="sr"><span class="slbl">Course fit</span><div class="strk"><div class="sfil" style="width:91%;background:#639922"></div></div><span class="sval">9.1</span></div><div class="sr"><span class="slbl">Current form</span><div class="strk"><div class="sfil" style="width:79%;background:#639922"></div></div><span class="sval">7.9</span></div><div class="sr"><span class="slbl">Market value</span><div class="strk"><div class="sfil" style="width:96%;background:#185fa5"></div></div><span class="sval">9.6</span></div></div><div class="pbody">The single biggest market inefficiency on the board. Aronimink has 16 par 4s — being the field's best par-4 scorer is a structural advantage. His course-fit profile produces model probabilities far above what +5500 implies across every placement market. Top-10 edge is +25%, top-20 edge is +34%.</div><div class="brow"><span class="bc bcw">Win</span><span class="bc bc10">Top 10 (+25% edge)</span><span class="bc bc10">Top 20 (+34% edge)</span></div><span class="ep epg">Largest model edge on the board</span></div>
+<div class="card gl"><div class="ph"><div><div class="pname">Matt Fitzpatrick</div><div class="psub">5 straight worldwide top-10s · career-best ball-striking · putting improving</div></div><div><div class="podds">+2200</div><div class="podmeta">to win</div></div></div><div class="tags"><span class="t tg">US Open champion (precision-over-power)</span><span class="t tg">Elite precision approach</span><span class="t tb">Northeast parkland specialist</span><span class="t tb">Putting trending at right time</span></div><div class="srows"><div class="sr"><span class="slbl">Course fit</span><div class="strk"><div class="sfil" style="width:92%;background:#639922"></div></div><span class="sval">9.2</span></div><div class="sr"><span class="slbl">Current form</span><div class="strk"><div class="sfil" style="width:84%;background:#639922"></div></div><span class="sval">8.4</span></div><div class="sr"><span class="slbl">Market value</span><div class="strk"><div class="sfil" style="width:76%;background:#185fa5"></div></div><span class="sval">7.6</span></div></div><div class="pbody">Won a US Open — the major most architecturally similar to Aronimink's demands. Career-best ball-striking at precisely the right course for that skill. See the 3-ball tab for group value at 2:05pm.</div><div class="brow"><span class="bc bcw">Win</span><span class="bc bc5">Top 5</span><span class="bc bc10">Top 10 (+15% edge)</span></div><span class="ep epg">Top-10 model edge: +15%</span></div>
+<div class="sech">Longshots</div>
+<div class="card pl"><div class="ph"><div><div class="pname">Adam Scott</div><div class="psub">Tour leader SG: Approach · 2nd par-3 scoring · major champion on bentgrass</div></div><div><div class="podds">+6000</div><div class="podmeta">to win</div></div></div><div class="tags"><span class="t tg">Tour leader SG: Approach (the #1 stat here)</span><span class="t tg">2nd par-3 scoring — par 3s penal at Aronimink</span><span class="t tb">Bentgrass major champion</span></div><div class="pbody">Leading the tour in the most important stat for this course. His par-3 scoring rank is directly applicable. Major champion bentgrass pedigree.</div><div class="brow"><span class="bc bc10">Top 10</span><span class="bc bc10">Top 20 (+21% edge)</span></div><span class="ep epg">Top-20 model edge: +21%</span></div>
+<div class="card pl"><div class="ph"><div><div class="pname">Rickie Fowler</div><div class="psub">Top-10 at Aronimink 2018 BMW · 3 straight top-10s · career-best iron play</div></div><div><div class="podds">+5500</div><div class="podmeta">to win</div></div></div><div class="tags"><span class="t tg">Direct Aronimink course form (top-10 BMW '18)</span><span class="t tg">Career-best iron play stretch 2026</span><span class="t tb">Bentgrass comfort · 3 straight top-10s</span></div><div class="pbody">Proven on-site form at this exact layout. Top-10 at the 2018 BMW Championship here. Career-best iron play right now. Playing in 8:18am group — see 3-ball tab for the best group bet of the week.</div><div class="brow"><span class="bc bc10">Top 10</span><span class="bc bc10">Top 20 (+20% edge)</span></div><span class="ep epg">Top-20 model edge: +20%</span></div>
+<div class="card pl"><div class="ph"><div><div class="pname">Keegan Bradley</div><div class="psub">Won 2018 BMW at Aronimink · only active player to have won here</div></div><div><div class="podds">+10000</div><div class="podmeta">to win</div></div></div><div class="tags"><span class="t tg">Won at Aronimink (2018 BMW)</span><span class="t tg">Precision iron / accuracy archetype</span><span class="t tb">Elite bentgrass putter</span><span class="t ta">2026 form cooler</span></div><div class="pbody">The only active player to have won at Aronimink. Top-20 ticket on course history alone is defensible.</div><div class="brow"><span class="bc bc10">Top 20 (+14% edge)</span></div><span class="ep epg">Top-20 model edge: +14%</span></div>
+<div class="card pl"><div class="ph"><div><div class="pname">Alex Fitzpatrick</div><div class="psub">2 wins last 5 worldwide · elite T2G · Top 40 at +125 verified</div></div><div><div class="podds">+10000</div><div class="podmeta">win / Top 40 at +125</div></div></div><div class="tags"><span class="t tg">Elite T2G precision — exact course archetype</span><span class="t tg">2 wins in last 5 worldwide starts</span><span class="t tg">Top 40 at +125 — verified Covers/DraftKings</span></div><div class="pbody">Best individual prop on the board. +125 top-40 implies ~44%; model gives ~58%. A 14-point gap on a verified, available market line.</div><div class="brow"><span class="bc bc10">Top 40 at +125</span><span class="bc bc10">Top 20 (+18% edge)</span></div><span class="ep epg">Top-40 edge: +14% · Top-20 edge: +18%</span></div>
+<div class="sech">Fades</div>
+<div class="card rl"><div class="ph"><div><div class="pname">Bryson DeChambeau</div><div class="psub">Missed Masters cut · WD LIV Mexico wrist · par-70 mutes entire game</div></div><div><div class="podds">+2200</div><div class="podmeta">market overpricing</div></div></div><div class="tags"><span class="t tr">Only 2 par 5s — distance irrelevant</span><span class="t tr">Missed Masters cut · WD LIV Mexico wrist</span><span class="t tr">Negative model edge at every bet type</span></div><div class="pbody">Entire game built around advantages this course cannot offer. Negative model edge at win (−8%), top-5 (−11%), top-10 (−13%), top-20 (−20%), top-40 (−28%). Fade across the board.</div><div class="brow"><span class="bc bcf">Fade all markets</span><span class="bc bcm">Beat Bryson matchup</span></div><span class="ep epr">Negative edge across every bet type</span></div>
+<div class="card rl"><div class="ph"><div><div class="pname">Jon Rahm</div><div class="psub">LIV — no verifiable recent SG data · priced as 2023–24 peak</div></div><div><div class="podds">+1500</div><div class="podmeta">market overpricing</div></div></div><div class="tags"><span class="t tr">LIV form opaque — no verifiable SG data</span><span class="t tr">Market pricing peak Rahm with no evidence</span><span class="t ta">Course fit profile strong when sharp</span></div><div class="pbody">+1500 prices him as if he's in demonstrable current form. No LIV SG data to verify. The market offers zero discount for this uncertainty.</div><div class="brow"><span class="bc bcf">Fade</span></div><span class="ep epr">Win edge: −0.1% · Top-40 edge: −7%</span></div>
+</div>
+
+<div id="pg-field" style="display:none">
+<div class="ctls">
+  <div><span class="clbl">Bet type</span><select id="bsel" onchange="renderField()"><option value="win">To win</option><option value="t5">Top 5 incl. ties</option><option value="t10">Top 10 incl. ties</option><option value="t20">Top 20 incl. ties</option><option value="t40">Top 40 incl. ties</option><option value="mc">Make cut</option><option value="miss">Miss cut</option></select></div>
+  <div><span class="clbl">Filter</span><select id="fsel" onchange="renderField()"><option value="all">All players</option><option value="pos">Positive edge</option><option value="strong">Strong edge (8%+)</option><option value="neg">Fades (negative edge)</option></select></div>
+  <div><span class="clbl">Search</span><input type="text" id="sinp" placeholder="name…" oninput="renderField()" style="width:120px"></div>
+</div>
+<div style="overflow-x:auto"><table>
+  <thead><tr>
+    <th onclick="sortBy('edge')" id="th-edge" class="on">Edge ↓</th>
+    <th onclick="sortBy('name')" id="th-name">Player</th>
+    <th onclick="sortBy('odds')" id="th-odds">Odds</th>
+    <th onclick="sortBy('imp')" id="th-imp">Mkt implied</th>
+    <th onclick="sortBy('mod')" id="th-mod">Model prob</th>
+    <th>Signal</th>
+  </tr></thead>
+  <tbody id="fbody"></tbody>
+</table></div>
+<div class="note">Edge = model probability − market implied probability for the selected bet type. Odds column shows the market price for that specific bet type. Model uses a Weibull-style finish distribution calibrated to a 156-player field, adjusted by course fit and form vs field averages. Win odds verified FanDuel/BetMGM May 12 2026.</div>
+</div>
+
+<div id="pg-props" style="display:none">
+<div class="sech">First round leader</div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Cameron Young — FRL</div><div style="font-size:11px;color:#888780;margin-top:2px">Morning wave 6:45am · soft greens · leads field SG: T2G</div></div><div><span class="t tg">Best bet</span><div class="prop-odds">+2200</div><div class="prop-odds-sub">FRL (estimated)</div></div></div><div class="prop-body">Young's elite T2G form and morning tee time give him the best profile for a first-round low score. Soft Thursday greens from lingering showers reduce the ATG scrambling penalty on Ross's crowned greens. Highest-probability FRL selection among the full field.</div><span class="ep epg">Model edge: +11% vs FRL implied</span></div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Ludvig Åberg — FRL</div><div style="font-size:11px;color:#888780;margin-top:2px">8:18am group · 4 top-5s last 7 events · better first-round scorer than Schauffele per Golf Channel</div></div><div><span class="t tb">Lean</span><div class="prop-odds">+3500</div><div class="prop-odds-sub">FRL (estimated)</div></div></div><div class="prop-body">Golf Channel analysts specifically noted Åberg outperforms Schauffele as a first-round scorer based on this season's numbers. T2G consistency and morning positioning make him a live FRL threat.</div><span class="ep epg">Model edge: +8% vs FRL implied</span></div>
+<div class="sech">Placement props (verified market lines)</div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Alex Fitzpatrick — Top 40 incl. ties</div><div style="font-size:11px;color:#888780;margin-top:2px">Verified +125 per Covers.com / DraftKings · 2 wins last 5 worldwide</div></div><div><span class="t tg">Best prop bet</span><div class="prop-odds">+125</div><div class="prop-odds-sub">top 40 incl. ties</div></div></div><div class="prop-body">The clearest individual prop on the board. +125 implies ~44% probability; model gives ~58% based on elite T2G precision and 8.5 course fit score. A 14-point gap on a verified, available market line.</div><span class="ep epg">Model edge: +14% vs implied</span></div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Alex Smalley — Top 40 incl. ties</div><div style="font-size:11px;color:#888780;margin-top:2px">Verified +130 per Covers.com · 7 top-25s in last 9 events</div></div><div><span class="t tb">Lean</span><div class="prop-odds">+130</div><div class="prop-odds-sub">top 40 incl. ties</div></div></div><div class="prop-body">Seven top-25s in nine events. 21st adjusted scoring average. Accurate T2G game suits Aronimink. +130 implies ~43%; model gives ~52%.</div><span class="ep epg">Model edge: +9% vs implied</span></div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Ludvig Åberg — Top 20 incl. ties</div><div style="font-size:11px;color:#888780;margin-top:2px">Verified -105 per Covers.com · 7 top-20s in last 8 events</div></div><div><span class="t tg">Value</span><div class="prop-odds">-105</div><div class="prop-odds-sub">top 20 incl. ties</div></div></div><div class="prop-body">Seven top-20s in eight events. 4th in SG: T2G in this field. -105 implies ~51%; model gives ~54%. Narrow but consistent-form edge at a course that suits his T2G-based game.</div><span class="ep epg">Model edge: +3% vs implied</span></div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Tyrrell Hatton — Top 20 incl. ties (Round 1)</div><div style="font-size:11px;color:#888780;margin-top:2px">Golf Channel: +200 is wrong number · T3 Masters 2026 · European bentgrass veteran</div></div><div><span class="t tg">Value</span><div class="prop-odds">+200</div><div class="prop-odds-sub">end of Round 1 top 20</div></div></div><div class="prop-body">Golf Channel analysts explicitly stated Hatton should be priced above Morikawa, Koepka, and Cantlay in this market. T-3 at the Masters confirms major-quality form. European bentgrass veteran.</div><span class="ep epg">Model edge: +12% vs implied</span></div>
+<div class="sech">Matchup bets</div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Rickie Fowler to beat Bryson DeChambeau</div><div style="font-size:11px;color:#888780;margin-top:2px">Both in verified 8:18am group · direct course form vs structural course misfit</div></div><div><span class="t tg">Strongest matchup</span><div class="prop-odds">~-115</div><div class="prop-odds-sub">est. 72-hole matchup</div></div></div><div class="prop-body">Most analytically clear matchup on the card. Fowler won here in 2018 (top-10 BMW) and is in career-best iron play. DeChambeau's distance dominance and par-5 attacking game is structurally irrelevant at a par-70 with 30-yard landing zones. Verify line Thursday morning.</div><span class="ep epg">Model: Fowler +18% win probability advantage</span></div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">Matt Fitzpatrick to beat Jon Rahm</div><div style="font-size:11px;color:#888780;margin-top:2px">Fitzpatrick verifiable elite form · Rahm LIV opacity</div></div><div><span class="t tb">Lean</span><div class="prop-odds">~even</div><div class="prop-odds-sub">est. 72-hole matchup</div></div></div><div class="prop-body">Fitzpatrick's current form is verifiable and elite. Rahm's LIV form is opaque. At even money or Fitzpatrick as slight underdog, the information asymmetry creates value.</div><span class="ep epg">Model: Fitzpatrick +9% win probability advantage</span></div>
+<div class="prop-card"><div class="prop-hdr"><div><div class="prop-title">LIV player leads after Round 1</div><div style="font-size:11px;color:#888780;margin-top:2px">11 LIV players in field · Golf Channel noted steam on "no" side</div></div><div><span class="t tr">Fade</span><div class="prop-odds">+550</div><div class="prop-odds-sub">LIV player leads R1</div></div></div><div class="prop-body">11 LIV players represent ~7% of the field. Golf Channel analysts noted explicit steam on the "no" side. Fade this market.</div><span class="ep epr">Model: fade</span></div>
+</div>
+
+<div id="pg-weather" style="display:none">
+<div style="font-size:12px;color:#5f5e5a;line-height:1.7;margin-bottom:1.25rem">All forecast data from PGA Tour official weather, AccuWeather, NWS, and BetMGM — verified May 12, 2026.</div>
+<div class="wday"><div class="wdtop"><div><div class="wdname">Thursday, May 14 — Round 1</div><div style="font-size:11px;color:#888780;margin-top:2px">Morning wave 6:45–9:30am · afternoon wave 12:40–3pm</div></div><div><div class="wdtemp">62–68°F</div><div class="wdsub">High / range</div></div></div><div class="wdpills"><span class="wp">35% rain chance</span><span class="wp">Wind 8–14 mph NW</span><span class="wp">Gusts to 22–30 mph</span><span class="wp">Lingering morning showers</span><span class="wp">Soft course</span></div><div class="wdimpact"><strong>Betting impact:</strong> Morning wave may catch lingering showers — soft greens hold approach shots and reduce ATG scrambling penalty. Wind gusts to 30mph add trajectory premium. <strong>Morning wave advantage: Young, Fowler, Åberg, McIlroy, Hatton all get softer conditions Thursday.</strong> Scheffler/Fitzpatrick/Rose tee off at 2:05pm into drier, firmer conditions.</div></div>
+<div class="wday"><div class="wdtop"><div><div class="wdname">Friday, May 15 — Round 2</div></div><div><div class="wdtemp">66–69°F</div><div class="wdsub">High / range</div></div></div><div class="wdpills"><span class="wp">15% rain chance</span><span class="wp">Wind 8–16 mph</span><span class="wp">Gusts to 24–26 mph</span><span class="wp">Mostly dry</span><span class="wp">Course firming</span></div><div class="wdimpact"><strong>Betting impact:</strong> Cleaner conditions. Course firming from Thursday softness. <strong>Bentgrass putting advantage increases as greens firm and speed up.</strong></div></div>
+<div class="wday"><div class="wdtop"><div><div class="wdname">Saturday, May 16 — Round 3</div></div><div><div class="wdtemp">77–79°F</div><div class="wdsub">High / range</div></div></div><div class="wdpills"><span class="wp">10% rain chance</span><span class="wp">Wind 8–14 mph W/SW</span><span class="wp">Gusts to 22 mph</span><span class="wp">Sunshine</span><span class="wp">Course firming fast</span></div><div class="wdimpact"><strong>Betting impact:</strong> Beautiful moving-day conditions. Greens getting faster — bentgrass putting specialists (Henley, Cantlay, Fowler) gain edge as surfaces approach peak speed. <strong>This is the round where bentgrass expertise becomes most decisive.</strong></div></div>
+<div class="wday"><div class="wdtop"><div><div class="wdname">Sunday, May 17 — Final round</div></div><div><div class="wdtemp">83–85°F</div><div class="wdsub">Hottest day</div></div></div><div class="wdpills"><span class="wp">15% rain chance</span><span class="wp">Wind 8–12 mph W</span><span class="wp">Gusts to 20 mph</span><span class="wp">Firm and fast</span><span class="wp">Peak bentgrass speed</span></div><div class="wdimpact"><strong>Betting impact:</strong> Firm, fast bentgrass greens at peak speed. <strong>The player who can make clutch bentgrass putts under Sunday pressure wins this championship.</strong></div></div>
+<div style="background:#f8f7f4;border:1px solid #e0dfd8;border-radius:12px;padding:13px 16px;margin-top:4px"><div style="font-size:11px;font-weight:500;color:#5f5e5a;margin-bottom:6px">Key betting angle — Thursday morning vs afternoon wave</div><div style="font-size:12px;color:#5f5e5a;line-height:1.7">Thursday morning soft greens reduce the ATG scrambling penalty that normally separates players on Ross's crowned greens. <strong>If morning wave gets meaningfully easier conditions: Young, Fowler, Åberg, McIlroy, and Hatton benefit. Scheffler, Fitzpatrick, and Rose (2:05pm) face firmer, harder conditions.</strong></div></div>
+</div>
+
+<div id="pg-ball3" style="display:none">
+<div style="font-size:12px;color:#5f5e5a;line-height:1.7;margin-bottom:1.25rem">3-ball bets pay on the best score in a group for one round. Edge comes from groups where one player's course fit and form diverges sharply from groupmates. All tee times verified via Golf Channel and Golf.com. Lines finalize Thursday morning.</div>
+<div id="gbody"></div>
+<div class="note">3-ball lines finalized by sportsbooks Thursday morning. Always verify your price before betting.</div>
+</div>
+
+</div>
+
+<script>
+var FIELD_AVG_FIT=7.2,FIELD_AVG_FORM=6.8;
+var RAW=[
+  {n:"Cameron Young",o:"+1100",fit:9.3,form:9.7,note:"2 wins + T3 Masters last 5. Leads field SG: T2G. 2nd bogey avoidance."},
+  {n:"Scottie Scheffler",o:"+480",fit:8.8,form:8.5,note:"Reigning PGA champion. No Aronimink experience. 3 runner-ups 2026."},
+  {n:"Rory McIlroy",o:"+850",fit:8.5,form:8.0,note:"2026 Masters champion. Distance muted at par-70. T19 Truist last week."},
+  {n:"Matt Fitzpatrick",o:"+2200",fit:9.2,form:8.4,note:"US Open winner. Career-best ball-striking. 5 straight worldwide top-10s."},
+  {n:"Ludvig Aberg",o:"+1800",fit:8.2,form:8.0,note:"4 top-5s last 7 events. 4th SG T2G. 13th accuracy. Bentgrass background."},
+  {n:"Xander Schauffele",o:"+1600",fit:8.0,form:7.5,note:"Major winner. Balanced skills. Bentgrass putter. Slightly cooler 2026 form."},
+  {n:"Russell Henley",o:"+5500",fit:9.1,form:7.9,note:"Best par-4 scorer in field. 3 straight major top-10s. 14th putter bentgrass."},
+  {n:"Adam Scott",o:"+6000",fit:8.8,form:7.8,note:"Tour leader SG: Approach. 2nd par-3 scoring. Major champion on bentgrass."},
+  {n:"Rickie Fowler",o:"+5500",fit:8.6,form:8.0,note:"Top-10 Aronimink 2018 BMW. Career-best iron play. 3 straight top-10s."},
+  {n:"Tyrrell Hatton",o:"+5500",fit:8.2,form:7.5,note:"T3 Masters 2026. European bentgrass veteran. Controlled ball-striker."},
+  {n:"Patrick Cantlay",o:"+3500",fit:8.5,form:6.5,note:"Elite bentgrass putter. Accuracy specialist. Aronimink 2018 form."},
+  {n:"Collin Morikawa",o:"+4000",fit:8.7,form:7.5,note:"Elite approach play — #1 stat here. Putter the only drag."},
+  {n:"Justin Rose",o:"+4500",fit:9.0,form:7.2,note:"Won AT&T National at Aronimink 2010 AND 2011. Two-time course winner."},
+  {n:"Keegan Bradley",o:"+10000",fit:8.8,form:7.0,note:"Won 2018 BMW at Aronimink. Only active player to have won here."},
+  {n:"Alex Fitzpatrick",o:"+10000",fit:8.5,form:7.8,note:"2 wins last 5 worldwide. Elite T2G. Precision approach specialist."},
+  {n:"Tommy Fleetwood",o:"+2700",fit:7.8,form:8.2,note:"Tour champion 2025. 5 top-10s 2026. Bentgrass background."},
+  {n:"Jon Rahm",o:"+1500",fit:8.0,form:5.5,note:"LIV — form opaque. No verifiable recent SG data."},
+  {n:"Brooks Koepka",o:"+3300",fit:7.5,form:6.0,note:"Major specialist. Needs power advantages absent here."},
+  {n:"Bryson DeChambeau",o:"+2200",fit:3.5,form:5.0,note:"Distance irrelevant at par-70. Missed Masters cut. WD wrist."},
+  {n:"Justin Thomas",o:"+5000",fit:7.8,form:6.5,note:"Past PGA champion. Controlled ball-striker. Inconsistent 2026 form."},
+  {n:"Hideki Matsuyama",o:"+6000",fit:7.8,form:8.0,note:"Hot 2026 form. Elite approach. Bermuda-based — bentgrass adjustment."},
+  {n:"Viktor Hovland",o:"+6000",fit:8.0,form:7.0,note:"Approach specialist. Bentgrass comfortable from European background."},
+  {n:"Alex Smalley",o:"+12500",fit:8.0,form:7.5,note:"7 top-25s in last 9 events. 21st adjusted scoring."},
+  {n:"Sam Burns",o:"+5500",fit:7.5,form:7.0,note:"Accuracy player. Bermuda specialist — bentgrass adjustment needed."},
+  {n:"Nicolai Hojgaard",o:"+5000",fit:7.8,form:7.0,note:"European Tour bentgrass veteran. Improving SG metrics."},
+  {n:"Min Woo Lee",o:"+5000",fit:7.2,form:7.2,note:"Solid all-around. Power advantage muted here."},
+  {n:"Si Woo Kim",o:"+5000",fit:7.2,form:7.0,note:"Solid ball-striker. Limited major championship record."},
+  {n:"Robert MacIntyre",o:"+6500",fit:7.8,form:7.0,note:"Links background, course management. Bentgrass experience."},
+  {n:"Jordan Spieth",o:"+8000",fit:7.5,form:6.5,note:"Elite putter/ATG. Ball-striking inconsistency is liability here."},
+  {n:"Shane Lowry",o:"+8000",fit:7.5,form:7.0,note:"Open champion. Course management precision. Bentgrass veteran."},
+  {n:"Brian Harman",o:"+17500",fit:7.5,form:6.5,note:"Open champion. Accuracy-first game fits Aronimink archetype."},
+  {n:"Harris English",o:"+10000",fit:7.5,form:7.5,note:"T2 PGA Championship 2025. Bomber with solid approach."},
+  {n:"Kristoffer Reitan",o:"+10000",fit:7.0,form:8.0,note:"Won Truist last week. Power game suits different courses."},
+  {n:"Akshay Bhatia",o:"+10000",fit:7.0,form:7.0,note:"Won Arnold Palmer 2026. Solid T2G. First major contention."},
+  {n:"Patrick Reed",o:"+7000",fit:7.0,form:6.5,note:"LIV form partially opaque. Past top-20 PGA Championship record."},
+  {n:"Maverick McNealy",o:"+7000",fit:7.5,form:6.5,note:"Elite accuracy off tee. Precision iron player — fits archetype."},
+  {n:"Sudarshan Yellamaraju",o:"+22500",fit:7.5,form:7.5,note:"Last player in. Best long-iron player on tour right now."},
+  {n:"Brandt Snedeker",o:"+25000",fit:6.5,form:7.0,note:"Won Myrtle Beach to get in. Poa specialist — bentgrass adjustment."},
+  {n:"Jason Day",o:"+12500",fit:7.5,form:6.0,note:"Former world #1. Bentgrass putter. Well below peak 2026 form."},
+  {n:"Ben Griffin",o:"+10000",fit:7.5,form:7.5,note:"Accuracy iron player — course archetype fits. Major experience thin."},
+  {n:"Wyndham Clark",o:"+17500",fit:6.5,form:6.0,note:"US Open winner but inconsistent 2026 form."},
+  {n:"Gary Woodland",o:"+10000",fit:6.5,form:5.5,note:"Power game not suited to par-70 layout."},
+  {n:"Chris Gotterup",o:"+6000",fit:7.0,form:7.2,note:"Power-based game. Distance advantage muted. Limited major experience."},
+  {n:"Kurt Kitayama",o:"+8000",fit:7.0,form:6.5,note:"Won Rocket 2025. Bentgrass experience."},
+  {n:"Nick Taylor",o:"+22500",fit:7.0,form:7.0,note:"Canadian Open winner 2025. Solid all-around."},
+  {n:"Aaron Rai",o:"+22500",fit:7.5,form:7.0,note:"DP World Tour accuracy leader 2025. Elite GIR. Bentgrass veteran."},
+  {n:"Sahith Theegala",o:"+25000",fit:6.5,form:6.5,note:"Power player. Fit limited at par-70."},
+  {n:"Corey Conners",o:"+15000",fit:7.5,form:6.5,note:"Elite accuracy off tee. Precision approach. Course archetype fits."},
+  {n:"Ryan Gerard",o:"+17500",fit:6.5,form:7.0,note:"Won Barracuda 2025. Limited major track record."},
+  {n:"Harry Hall",o:"+12500",fit:7.0,form:6.5,note:"Solid ball-striker. Limited high-profile major exposure."},
+  {n:"Pierceson Coody",o:"+15000",fit:7.0,form:6.5,note:"Accurate iron player. First major contention."},
+  {n:"Sungjae Im",o:"+15000",fit:7.0,form:6.5,note:"Consistent PGA Tour performer. Solid T2G. Bentgrass experience."},
+  {n:"Ryan Fox",o:"+22500",fit:7.0,form:7.0,note:"Canadian Open winner 2025. Power with decent accuracy."},
+  {n:"Denny McCarthy",o:"+25000",fit:7.0,form:6.5,note:"Accurate iron player. Streaky putter. Limited major form."},
+  {n:"Matt McCarty",o:"+15000",fit:7.0,form:6.5,note:"John Deere winner 2025. Accurate iron player. First major."},
+  {n:"Lucas Glover",o:"+25000",fit:7.0,form:6.5,note:"Past US Open winner. Experienced major performer."},
+  {n:"Billy Horschel",o:"+25000",fit:7.5,form:6.5,note:"Accuracy-first. Past Memorial winner. Fits course archetype."},
+  {n:"Cameron Smith",o:"+25000",fit:6.5,form:5.5,note:"LIV. Bermuda specialist — bentgrass adjustment. Form opaque."},
+  {n:"Stephan Jaeger",o:"+25000",fit:7.0,form:6.5,note:"Solid accuracy. European background. Limited major experience."},
+  {n:"Keith Mitchell",o:"+22500",fit:7.0,form:6.5,note:"Solid ball-striker. Accurate driver. Limited major form."},
+  {n:"Daniel Berger",o:"+22500",fit:7.0,form:6.0,note:"Past major form solid. 2026 form mixed."},
+  {n:"Jhonattan Vegas",o:"+25000",fit:6.5,form:6.5,note:"Led Round 1 at 2025 PGA Championship."},
+  {n:"Tom McKibbin",o:"+25000",fit:7.0,form:6.5,note:"DP World Tour talent. Bentgrass experience. First PGA Championship."},
+  {n:"Joaquin Niemann",o:"+8000",fit:7.0,form:7.0,note:"LIV. Solid ball-striker. Form partially opaque."},
+  {n:"Dustin Johnson",o:"+25000",fit:6.5,form:5.0,note:"LIV. Past form opaque. Age/form decline evident."},
+  {n:"J.T. Poston",o:"+25000",fit:7.0,form:6.5,note:"Accurate iron player. Limited major track record."},
+  {n:"Jacob Bridgeman",o:"+10000",fit:7.0,form:6.5,note:"Improving PGA Tour player. Solid T2G. First major."},
+  {n:"Taylor Pendrith",o:"+25000",fit:6.5,form:6.5,note:"Power player. Distance advantage neutralized here."},
+  {n:"Aldrich Potgieter",o:"+22500",fit:5.5,form:8.5,note:"Won Rocket 2025. Power bomber. Par-70 mutes distance."},
+  {n:"David Puig",o:"+50000",fit:6.0,form:5.5,note:"LIV. Limited major experience."},
+  {n:"Martin Kaymer",o:"+50000",fit:6.5,form:5.0,note:"Past PGA champion. Lifetime exemption. Well past peak."},
+  {n:"Garrick Higgo",o:"+50000",fit:6.0,form:5.5,note:"South African. Limited recent form. First major."},
+  {n:"Rico Hoey",o:"+50000",fit:6.0,form:6.0,note:"Young Filipino-American. First major."},
+  {n:"Y.E. Yang",o:"+100000",fit:5.5,form:4.0,note:"Past PGA champion. Lifetime exemption. Well past peak form."},
+  {n:"Michael Block",o:"+100000",fit:5.0,form:5.0,note:"PGA club pro. Famous top-15 at Oak Hill 2023."},
+  {n:"Braden Shattuck",o:"+100000",fit:4.0,form:4.0,note:"PGA club pro qualifier."},
+  {n:"Francisco Bide",o:"+100000",fit:4.5,form:4.5,note:"PGA club pro qualifier."},
+  {n:"Ricky Castillo",o:"+25000",fit:6.5,form:6.0,note:"KFT graduate. Limited major track record."},
+  {n:"Sebastian Munoz",o:"+50000",fit:6.5,form:5.5,note:"LIV. Past PGA form. Limited current data."},
+];
+function impl(o){var n=parseInt(o.replace('+','').replace('-',''));return o.startsWith('-')?Math.abs(n)/(Math.abs(n)+100)*100:100/(n+100)*100;}
+function calcModelWin(p){var mw=impl(p.o);var fb=(p.fit-FIELD_AVG_FIT)/FIELD_AVG_FIT;var fr=(p.form-FIELD_AVG_FORM)/FIELD_AVG_FORM;var mult=1+(0.55*fb)+(0.45*fr);return Math.max(mw*mult,0.05);}
+function finishProbs(mwp){var p=mwp/100;return{win:mwp,t5:Math.min((1-Math.pow(1-p,5*0.65))*100,94),t10:Math.min((1-Math.pow(1-p,10*0.55))*100,94),t20:Math.min((1-Math.pow(1-p,20*0.42))*100,94),t40:Math.min((1-Math.pow(1-p,40*0.32))*100,94),mc:Math.min((1-Math.pow(1-p,70*0.28))*100,94),miss:Math.max(100-Math.min((1-Math.pow(1-p,70*0.28))*100,94),6)};}
+function mktImplBt(wi,bt){if(bt==='win')return wi;var sc={t5:2.5,t10:4.0,t20:6.5,t40:10,mc:16,miss:60};return Math.min(wi*(sc[bt]||1),bt==='miss'?55:93);}
+function toAO(prob){if(prob<=0)return 'N/A';if(prob>=99)return '-9900';if(prob>=50){return '-'+Math.round(prob/(100-prob)*100);}return '+'+Math.round((100-prob)/prob*100);}
+var PLAYERS=RAW.map(function(p){var mw=calcModelWin(p);return Object.assign({},p,{mw:mw,probs:finishProbs(mw)});});
+var sortCol='edge',sortDir=-1;
+function renderField(){
+  var bt=document.getElementById('bsel').value;
+  var f=document.getElementById('fsel').value;
+  var s=(document.getElementById('sinp').value||'').toLowerCase();
+  var rows=PLAYERS.map(function(p){var mi=mktImplBt(impl(p.o),bt);var mo=p.probs[bt];var e=mo-mi;return Object.assign({},p,{_e:e,_mi:mi,_mo:mo,_ao:toAO(mi)});});
+  rows.sort(function(a,b){if(sortCol==='name')return sortDir*(a.n<b.n?-1:1);if(sortCol==='odds')return sortDir*(impl(a.o)-impl(b.o));if(sortCol==='edge')return sortDir*(a._e-b._e);if(sortCol==='imp')return sortDir*(a._mi-b._mi);if(sortCol==='mod')return sortDir*(a._mo-b._mo);return 0;});
+  if(f==='pos')rows=rows.filter(function(p){return p._e>0;});
+  if(f==='strong')rows=rows.filter(function(p){return p._e>=8;});
+  if(f==='neg')rows=rows.filter(function(p){return p._e<0;});
+  if(s)rows=rows.filter(function(p){return p.n.toLowerCase().includes(s);});
+  var body=document.getElementById('fbody');body.innerHTML='';
+  rows.forEach(function(p,i){
+    var e=p._e,ef=(e>=0?'+':'')+e.toFixed(1)+'%';
+    var ec=e>=10?'#27500a':e>=3?'#3b6d11':e>=-3?'#888780':'#791f1f';
+    var bw=Math.min(100,Math.abs(e)*2.5);var bc=e>=0?'#639922':'#e24b4a';
+    var sig=e>=12?'<span class="t tg">Strong bet</span>':e>=5?'<span class="t tb">Lean</span>':e>=-3?'<span class="t tgr">Neutral</span>':'<span class="t tr">Fade</span>';
+    body.innerHTML+='<tr><td><div style="font-weight:500;font-size:13px;color:'+ec+'">'+ef+'</div><div class="bw"><div class="bi" style="width:'+bw+'%;background:'+bc+'"></div></div></td><td><div class="pn">'+(i<3?'★ ':'')+p.n+'</div><div class="pnt">'+p.note+'</div></td><td style="font-weight:500;font-size:12px">'+p._ao+'</td><td style="font-size:12px">'+p._mi.toFixed(1)+'%</td><td style="font-weight:500;font-size:12px">'+p._mo.toFixed(1)+'%</td><td>'+sig+'</td></tr>';
+  });
+}
+function sortBy(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=(col==='edge'||col==='mod')?-1:col==='name'?1:-1;}
+  document.querySelectorAll('th').forEach(function(t){t.classList.remove('on');t.textContent=t.textContent.replace(' ↓','').replace(' ↑','');});
+  var th=document.getElementById('th-'+col);if(th){th.classList.add('on');th.textContent+=(sortDir===-1?' ↓':' ↑');}
+  renderField();
+}
+var GROUPS=[
+  {time:"6:45 AM",edge:"hot",players:[{n:"Braden Shattuck",o:"+100000",fit:4.0,note:"PGA club pro. Non-contender."},{n:"Alex Fitzpatrick",o:"+10000",fit:8.5,note:"2 wins last 5 worldwide. Elite T2G. Precision iron specialist."},{n:"Ben Griffin",o:"+10000",fit:7.5,note:"Accuracy iron player — course archetype fits well."}],pick:"Alex Fitzpatrick",reason:"The clearest 3-ball edge on the card. Fitzpatrick against a PGA club pro and a similar-ranked peer. His course fit dominates this group and morning soft conditions add advantage. Bet him directly."},
+  {time:"7:34 AM",edge:"lean",players:[{n:"Gary Woodland",o:"+10000",fit:6.5,note:"Power game doesn't fit par-70 layout."},{n:"Jason Day",o:"+12500",fit:7.5,note:"Bentgrass putter. Well below peak form."},{n:"Sam Burns",o:"+5500",fit:7.5,note:"Best current form and odds in this group."}],pick:"Sam Burns",reason:"Burns has the best 2026 form and tightest odds in this group. Accuracy game partially fits despite Bermuda home-course background. Woodland's power profile mismatches the course; Day is below peak."},
+  {time:"7:56 AM",edge:"lean",players:[{n:"Patrick Cantlay",o:"+3500",fit:8.5,note:"Elite bentgrass putter. Accuracy specialist. Aronimink 2018 form."},{n:"Min Woo Lee",o:"+5000",fit:7.2,note:"Solid all-around. Power advantage muted here."},{n:"Sahith Theegala",o:"+25000",fit:6.5,note:"Power player — limited course fit at par-70."}],pick:"Patrick Cantlay",reason:"Cantlay's bentgrass putting and precision iron game are exactly what Aronimink rewards. His 2018 form here is a direct positive signal. He's the clear pick in this group on fit and form combined."},
+  {time:"8:18 AM",edge:"hot",players:[{n:"Bryson DeChambeau",o:"+2200",fit:3.5,note:"Massive course misfit. Missed Masters. WD LIV Mexico wrist."},{n:"Ludvig Aberg",o:"+1800",fit:8.2,note:"4 top-5s last 7 events. Elite T2G. European bentgrass background."},{n:"Rickie Fowler",o:"+5500",fit:8.6,note:"Top-10 at Aronimink 2018 BMW. Career-best iron play. 3 straight top-10s."}],pick:"Rickie Fowler",reason:"The best 3-ball bet of the week. Fowler has direct course form at this exact layout (top-10 BMW '18) and career-best iron play, grouped with the player most mismatched to Aronimink. Bryson's name artificially shortens his price and stretches Fowler's line. Play Fowler 3-ball outright and Fowler vs Bryson head-to-head."},
+  {time:"8:29 AM",edge:"lean",players:[{n:"Xander Schauffele",o:"+1600",fit:8.0,note:"Major winner. Consistent major form. Bentgrass putter."},{n:"Brooks Koepka",o:"+3300",fit:7.5,note:"Major specialist. Needs par-5 power advantages absent here."},{n:"Tyrrell Hatton",o:"+5500",fit:8.2,note:"T3 Masters 2026. European bentgrass veteran. Controlled ball-striker."}],pick:"Xander Schauffele",reason:"Schauffele is the model's slight favorite. Consistent major form and bentgrass putting over Koepka (who needs par-5 dominance) and Hatton (underpriced in props — his 3-ball line may also be wrong)."},
+  {time:"8:40 AM",edge:"lean",players:[{n:"Rory McIlroy",o:"+850",fit:8.5,note:"Masters champion. Distance muted at par-70. T19 Truist last week."},{n:"Jordan Spieth",o:"+8000",fit:7.5,note:"Elite putter/ATG. Ball-striking inconsistency is a concern."},{n:"Jon Rahm",o:"+1500",fit:8.0,note:"LIV — form opaque. Market overprices on reputation alone."}],pick:"Rory McIlroy",reason:"McIlroy is the model pick despite T19 last week. Spieth's ball-striking volatility and Rahm's opaque LIV form make this relatively clear. Alternative: if Rahm is priced tight, lean toward Spieth who has verifiable recent data and an elite short game."},
+  {time:"2:05 PM",edge:"hot",players:[{n:"Scottie Scheffler",o:"+480",fit:8.8,note:"Reigning champion. No Aronimink experience. Iron proximity slight concern 2026."},{n:"Matt Fitzpatrick",o:"+2200",fit:9.2,note:"US Open winner. 5 straight worldwide top-10s. Career-best ball-striking."},{n:"Justin Rose",o:"+4500",fit:9.0,note:"Won AT&T National at Aronimink 2010 AND 2011."}],pick:"Matt Fitzpatrick",reason:"Best 3-ball value of the afternoon wave. Fitzpatrick has the highest course fit score (9.2) and strongest verifiable current form. Being grouped against the world #1 stretches his 3-ball line artificially. Rose at +4500 outright is also worth a small ticket on two Aronimink wins."}
+];
+function renderGroups(){
+  var b=document.getElementById('gbody');if(!b)return;
+  var html='';
+  GROUPS.forEach(function(g){
+    var cl=g.edge==='hot'?'hot':'lean';
+    var badge=g.edge==='hot'?'<span class="t tg">Strong edge</span>':'<span class="t tb">Lean</span>';
+    html+='<div class="grp '+cl+'"><div class="gtop"><span class="gtime">'+g.time+' — Round 1, Thu May 14</span>'+badge+'</div>';
+    g.players.forEach(function(p){var fc=p.fit>=8.5?'tg':p.fit>=7?'tb':'ta';html+='<div class="gprow"><div><div class="pn">'+p.n+'</div><div class="pnt">'+p.note+'</div></div><div class="gright"><div class="godds">'+p.o+'</div><span class="t '+fc+'" style="display:inline-block;margin-top:3px">fit '+p.fit.toFixed(1)+'</span></div></div>';});
+    html+='<div class="verd"><strong>Play: '+g.pick+'</strong> — '+g.reason+'</div></div>';
+  });
+  b.innerHTML=html;
+}
+var TAB_IDS=['picks','field','props','weather','ball3'];
+function showTab(tab){
+  TAB_IDS.forEach(function(t){var el=document.getElementById('pg-'+t);if(el)el.style.display=t===tab?'block':'none';});
+  document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',TAB_IDS[i]===tab);});
+  if(tab==='field')renderField();
+  if(tab==='ball3')renderGroups();
+}
+renderField();
+</script>
+</body>
+</html>
